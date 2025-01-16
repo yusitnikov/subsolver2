@@ -27,7 +27,7 @@ const Home = () => (
   <div className="home-page">
     <h1>
       <span className="home-page-title">
-        <img className="home-logo" src="/logo512.png" alt="" />
+        <img className="home-logo" src={`${process.env.PUBLIC_URL}/logo512.png`} alt="" />
         <span>Subsolver</span>
       </span>
       <span className="home-page-subtitle">A Substitution Cipher Game!</span>
