@@ -2,26 +2,27 @@ import { useState } from "react";
 import keysPressed from "../keyspressed";
 import useEventListener from "@use-it/event-listener";
 
-const getLettersPressed = () =>
+const getLettersPressed = (alphabet: string) =>
   new Set(
     Array.from(keysPressed.getKeysPressed())
-      .filter((str) => str.startsWith("Key") || str === "Space")
-      .map((str) => str.toLowerCase().replace("key", ""))
+      .map((key) => key === " " ? "space" : key.toLowerCase())
+      .filter((key) => alphabet.includes(key) || key === "space")
   );
 
 export const useKeysDown = (
+  alphabet: string,
   handleKeysChange: (keys: Set<string>) => unknown = () => {}
 ) => {
   const [keysDown, setKeysDown] = useState<Set<string>>(new Set());
 
   const keyDownHandler = () => {
-    const next = getLettersPressed();
+    const next = getLettersPressed(alphabet);
     setKeysDown(next);
     handleKeysChange(next);
   };
 
   const keyUpHandler = () => {
-    const next = getLettersPressed();
+    const next = getLettersPressed(alphabet);
     setKeysDown(next);
     handleKeysChange(next);
   };

@@ -4,6 +4,7 @@ export interface Plaintext {
   author: string;
   origin: string;
   notes?: string;
+  alphabet?: string;
 }
 
 const plaintexts: Plaintext[] = [

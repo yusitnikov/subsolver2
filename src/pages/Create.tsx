@@ -6,6 +6,7 @@ import { generatePath } from "react-router-dom";
 import { Plaintext } from "../plaintexts";
 import { encodeBase64 } from "../util";
 import { CopyTextButton } from "../CopyTextButton";
+import { englishAlphabet } from "../constants";
 
 const minLength = 20;
 
@@ -14,6 +15,7 @@ const Create = () => {
   const [author, setAuthor] = useState("");
   const [origin, setOrigin] = useState("");
   const [mode, setMode] = useState("casual");
+  const [alphabet, setAlphabet] = useState(englishAlphabet);
 
   const isTooShort = text.trim().length < minLength;
 
@@ -23,6 +25,7 @@ const Create = () => {
       text,
       author,
       origin,
+      alphabet,
     };
     const encodedPlaintext = encodeBase64(JSON.stringify(plaintext));
     const link = window.location.origin + generatePath("/:mode/custom#:data", {mode, data: encodedPlaintext});
@@ -93,6 +96,15 @@ const Create = () => {
               value={origin}
               onChange={(event) => setOrigin(event.target.value)}
               label={"Origin"}
+              fullWidth={true}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              value={alphabet}
+              onChange={(event) => setAlphabet(event.target.value)}
+              label={"Alphabet"}
               fullWidth={true}
             />
           </Grid>

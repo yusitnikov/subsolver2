@@ -1,8 +1,8 @@
 import "./Puzzle.css";
 import CipherTextDisplay from "./CipherTextDisplay";
 import { ReactElement, useMemo, useState } from "react";
-import { swapLetters, findInitialMapping } from "./mapping";
-import { alphabet } from "../constants";
+import { swapLetters } from "./mapping";
+import { englishAlphabet } from "../constants";
 import { hrTime, shuffleArray } from "../util";
 import { Plaintext } from "../plaintexts";
 import { applyMapping } from "./mapping";
@@ -15,6 +15,7 @@ export interface GameModifiers {
   hideSpaces?: boolean;
   showPunctuation?: boolean;
   keepCapitals?: boolean;
+  alphabet?: string;
 }
 
 type PuzzleState = "locked" | "active" | "complete";
@@ -39,11 +40,12 @@ function Puzzle({
   hideSpaces,
   showPunctuation,
   keepCapitals,
+  alphabet = englishAlphabet,
 }: PuzzleProps) {
   const { inputHandler: InputHandler } = getInputSchema();
 
   const shouldStartLocked = startLocked();
-  const initialMapping = useMemo(() => findInitialMapping(text), [text]);
+  const initialMapping = useMemo(() => shuffleArray(alphabet.split("")).join(""), [alphabet]);
   const [mapping, setMapping] = useState<string>(initialMapping);
   const [lockedLetters, setLockedLetters] = useState<Set<string>>(new Set());
   const [puzzleState, setPuzzleState] = useState<PuzzleState>(
@@ -68,7 +70,7 @@ function Puzzle({
       const newMapping = swapLetters(mapping, a, b);
       setMapping(newMapping);
       pushEvent(`"${a.toUpperCase()}" and "${b.toUpperCase()}" swapped.`);
-      if (applyMapping(text, newMapping) === applyMapping(text, alphabet)) {
+      if (applyMapping(text, newMapping, {alphabet}) === applyMapping(text, alphabet, {alphabet})) {
         pushEvent(id ? `Puzzle #${id} solved` : "Custom puzzle solved");
         const allSolved = getAllSolved();
         const puzzleEndTime = new Date();
@@ -147,8 +149,10 @@ function Puzzle({
               hideSpaces,
               showPunctuation,
               keepCapitals,
+              alphabet,
             })}
             lockedLetters={lockedLetters}
+            alphabet={alphabet}
           />
         </div>
         <div className="puzzle-buttons-wrapper">
@@ -180,6 +184,7 @@ function Puzzle({
         swap={suppressIfInactive(handleSwap)}
         setLock={suppressIfInactive(handleLocked)}
         lockedLetters={lockedLetters}
+        alphabet={alphabet}
       />
     </div>
   );

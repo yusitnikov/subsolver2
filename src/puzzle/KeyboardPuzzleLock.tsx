@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useKeysDown } from "./puzzle-util";
+import { englishAlphabet } from "../constants";
 
 const key =
   (keysDown: Set<string>) =>
@@ -16,9 +17,10 @@ type LockState = "active" | "keyspressed" | "released";
 
 const ANIMATION_DURATION = 1500;
 
+// TODO: localize the lock
 const PuzzleLock = ({ unlock }: { unlock: () => void }) => {
   const [lockState, setLockState] = useState<LockState>("active");
-  const keysDown = useKeysDown((newKeys) => {
+  const keysDown = useKeysDown(englishAlphabet, (newKeys) => {
     if (newKeys.has("f") && newKeys.has("j") && lockState === "active") {
       setLockState("keyspressed");
     } else if (newKeys.size === 0 && lockState === "keyspressed") {

@@ -172,7 +172,7 @@ const ClassicPageContents = ({
         </span>
       </header>
       <ClassicPuzzle
-        gameModifiers={gameModifiers}
+        gameModifiers={{...gameModifiers, alphabet: plainText.alphabet}}
         startNewPuzzle={startNewPuzzle}
         plainText={plainText}
         pushEvent={pushEvent}

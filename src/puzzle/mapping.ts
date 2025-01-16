@@ -1,9 +1,10 @@
-import { alphabet, frequencyOrder } from "../constants";
+import { englishAlphabet } from "../constants";
 
 interface MappingOptions {
   hideSpaces?: boolean;
   showPunctuation?: boolean;
   keepCapitals?: boolean;
+  alphabet?: string;
 }
 
 const _normalizeText = (
@@ -12,6 +13,7 @@ const _normalizeText = (
     hideSpaces = false,
     showPunctuation = false,
     keepCapitals = false,
+    alphabet = englishAlphabet,
   }: MappingOptions
 ) => {
   let text = inText;
@@ -23,7 +25,7 @@ const _normalizeText = (
     text = text.replace(/[-…—]/g, " ");
   }
   if (!showPunctuation) {
-    const rejectionRegex = hideSpaces ? /[^a-zA-Z]/g : /[^a-zA-Z ]/g;
+    const rejectionRegex = new RegExp(`[^${alphabet}${hideSpaces ? "" : " "}]`, "ig");
     text = text.replace(rejectionRegex, "");
   }
   return text;
@@ -33,8 +35,10 @@ export const applyMapping = (
   text: string,
   mapping: string,
   mappingOptions: MappingOptions = {}
-) =>
-  _normalizeText(text, mappingOptions)
+) => {
+  const {alphabet = englishAlphabet} = mappingOptions;
+
+  return _normalizeText(text, mappingOptions)
     .split("")
     .map((letter) => {
       // For both capital and lowercase letters
@@ -48,6 +52,7 @@ export const applyMapping = (
       }
     })
     .join("");
+};
 
 export const swapLetters = (mapping: string, a: string, b: string) => {
   const newMapping = mapping.split("");
@@ -57,27 +62,4 @@ export const swapLetters = (mapping: string, a: string, b: string) => {
   newMapping[aPos] = newMapping[bPos];
   newMapping[bPos] = temp;
   return newMapping.join("");
-};
-
-const _getLetterCounts = (normalizedText: string) => {
-  const counts = Object.fromEntries(
-    alphabet.split("").map((letter) => [letter, 0])
-  );
-  for (let i = 0; i < normalizedText.length; i++) {
-    counts[normalizedText[i]]++;
-  }
-  return counts;
-};
-
-export const findInitialMapping = (text: string) => {
-  const normalized = _normalizeText(text, { hideSpaces: true });
-  const letterCounts = Object.entries(_getLetterCounts(normalized));
-  letterCounts.sort((a, b) => b[1] - a[1]);
-  const mappingEntries = letterCounts.map(([letter], index) => [
-    frequencyOrder[index],
-    letter,
-  ]);
-  mappingEntries.sort(([a], [b]) => a.localeCompare(b));
-  const finalMapping = mappingEntries.map(([_, letter]) => letter).join("");
-  return finalMapping;
 };

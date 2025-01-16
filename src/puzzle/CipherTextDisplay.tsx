@@ -1,16 +1,19 @@
 import { Card } from "@mui/material";
 import { useKeysDown } from "./puzzle-util";
+import { englishAlphabet } from "../constants";
 
 interface CipherTextDisplayProps {
   text: string;
   lockedLetters?: Set<string>;
+  alphabet?: string;
 }
 
 const CipherTextDisplay = ({
   text,
   lockedLetters = new Set(),
+  alphabet = englishAlphabet,
 }: CipherTextDisplayProps) => {
-  const keysDown = useKeysDown();
+  const keysDown = useKeysDown(alphabet);
 
   const children = text.split("").map((letter, index) => {
     const lowerCased = letter.toLowerCase();

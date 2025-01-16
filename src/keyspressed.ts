@@ -1,18 +1,18 @@
 class KeysPressed {
-  keysPressed: Set<string> = new Set();
+  keysMap: Record<string, string> = {};
   constructor() {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.code === "Space") {
         event.preventDefault();
       }
-      this.keysPressed.add(event.code);
+      this.keysMap[event.code] = event.key;
     });
     document.addEventListener("keyup", (event: KeyboardEvent) => {
-      this.keysPressed.delete(event.code);
+      delete this.keysMap[event.code];
     });
   }
   getKeysPressed(): Set<string> {
-    return new Set(this.keysPressed);
+    return new Set(Object.values(this.keysMap));
   }
 }
 
