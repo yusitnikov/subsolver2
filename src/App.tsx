@@ -3,7 +3,7 @@ import Classic from "./pages/Classic";
 import Home from "./pages/Home";
 import Tutorial from "./pages/Tutorial";
 import Create from "./pages/Create";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { HashRouter, Switch, Route } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from '@mui/material/styles'
@@ -26,7 +26,7 @@ function App() {
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
-        <Router basename={process.env.PUBLIC_URL}>
+        <HashRouter>
           <Switch>
             <Route path="/classic">
               <Title title="Subsolver - Classic" />
@@ -61,7 +61,7 @@ function App() {
               <Home />
             </Route>
           </Switch>
-        </Router>
+        </HashRouter>
         <CssBaseline enableColorScheme />
       </ThemeProvider>
     </div>

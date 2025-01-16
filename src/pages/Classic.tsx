@@ -15,7 +15,6 @@ import {
   Redirect,
   useParams,
   useHistory,
-  useLocation,
 } from "react-router-dom";
 import { recordEvent } from "../tracking";
 import getInputSchema from "../inputTypes";
@@ -145,12 +144,11 @@ const ClassicPageContents = ({
   events,
   basePath,
 }: ClassicPageContentsProps) => {
-  let { puzzleId } = useParams() as { puzzleId: string };
-  const { hash } = useLocation();
+  let { puzzleId, data } = useParams() as { puzzleId: string; data?: string };
   const plainText = useMemo(() => {
-    if (puzzleId === "custom") {
+    if (puzzleId === "custom" && data) {
       try {
-        return JSON.parse(decodeBase64(decodeURIComponent(hash.substring(1)))) as Plaintext;
+        return JSON.parse(decodeBase64(decodeURIComponent(data))) as Plaintext;
       } catch (e) {
         console.error("Failed to parse custom puzzle from URL:", e);
         window.alert("Failed to parse custom puzzle");
@@ -159,7 +157,7 @@ const ClassicPageContents = ({
     }
 
     return plaintexts.find((plain) => plain.id === puzzleId);
-  }, [puzzleId, hash]);
+  }, [puzzleId, data]);
   if (!plainText) {
     return <Redirect to={basePath} />;
   }
@@ -203,7 +201,7 @@ const ClassicRouter = ({ gameModifiers, headerText }: ClassicProps) => {
     <div className="classic-page">
       <PageHeader headerText={headerText} />
       <Switch>
-        <Route path={`${path}/:puzzleId`}>
+        <Route path={`${path}/:puzzleId/:data?`}>
           <ClassicPageContents
             gameModifiers={gameModifiers}
             startNewPuzzle={startNewPuzzle}

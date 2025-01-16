@@ -28,7 +28,7 @@ const Create = () => {
       alphabet,
     };
     const encodedPlaintext = encodeBase64(JSON.stringify(plaintext));
-    const link = window.location.origin + generatePath("/:mode/custom#:data", {mode, data: encodedPlaintext});
+    const link = window.location.origin + process.env.PUBLIC_URL + generatePath("/#/:mode/custom/:data", {mode, data: encodedPlaintext});
 
     navigator.clipboard.writeText(link);
   };
