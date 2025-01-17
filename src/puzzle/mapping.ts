@@ -1,4 +1,4 @@
-import { englishAlphabet } from "../constants";
+import { englishAlphabet, finalLettersMap, finalLettersReverseMap } from "../constants";
 
 interface MappingOptions {
   hideSpaces?: boolean;
@@ -6,6 +6,9 @@ interface MappingOptions {
   keepCapitals?: boolean;
   alphabet?: string;
 }
+
+export const regularToFinal = (letter: string) => finalLettersMap[letter] ?? letter;
+export const finalToRegular = (letter: string) => finalLettersReverseMap[letter] ?? letter;
 
 const _normalizeText = (
   inText: string,
@@ -40,6 +43,7 @@ export const applyMapping = (
 
   return _normalizeText(text, mappingOptions)
     .split("")
+    .map(finalToRegular)
     .map((letter) => {
       // For both capital and lowercase letters
       const fullMapping = mapping + mapping.toUpperCase();
@@ -51,6 +55,7 @@ export const applyMapping = (
         return fullMapping[fullAlphabet.indexOf(letter)];
       }
     })
+    .map((letter, index, array) => alphabet.includes(array[index + 1]) ? letter : regularToFinal(letter))
     .join("");
 };
 

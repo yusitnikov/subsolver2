@@ -1,12 +1,12 @@
 import "./Create.css";
-import { useState, KeyboardEvent } from "react";
-import {Alert, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import { useState, KeyboardEvent, useMemo } from "react";
+import { Alert, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import PageHeader from "../layout/PageHeader";
 import { generatePath } from "react-router-dom";
 import { Plaintext } from "../plaintexts";
 import { encodeBase64 } from "../util";
 import { CopyTextButton } from "../CopyTextButton";
-import { englishAlphabet } from "../constants";
+import { alphabets, hebrewAlphabet } from "../constants";
 
 const minLength = 20;
 
@@ -15,7 +15,26 @@ const Create = () => {
   const [author, setAuthor] = useState("");
   const [origin, setOrigin] = useState("");
   const [mode, setMode] = useState("casual");
-  const [alphabet, setAlphabet] = useState(englishAlphabet);
+  const [alphabet, setAlphabet] = useState("auto");
+
+  const autoAlphabet = useMemo(() => {
+    const textLetters = text.toLowerCase().split("");
+
+    let bestMatch = alphabets[0];
+    let bestScore = 0;
+
+    for (const item of alphabets) {
+      const score = textLetters.filter(letter => item.alphabet.includes(letter)).length;
+      if (score > bestScore) {
+        bestMatch = item;
+        bestScore = score;
+      }
+    }
+
+    return bestMatch;
+  }, [text]);
+  const finalAlphabet = alphabet === "auto" ? autoAlphabet.alphabet : alphabet;
+  const dir = finalAlphabet === hebrewAlphabet ? "rtl" : "ltr";
 
   const isTooShort = text.trim().length < minLength;
 
@@ -25,7 +44,7 @@ const Create = () => {
       text,
       author,
       origin,
-      alphabet,
+      alphabet: finalAlphabet,
     };
     const encodedPlaintext = encodeBase64(JSON.stringify(plaintext));
     const link = window.location.origin + process.env.PUBLIC_URL + generatePath("/#/:mode/custom/:data", {mode, data: encodedPlaintext});
@@ -59,6 +78,7 @@ const Create = () => {
               multiline={true}
               minRows={5}
               autoFocus={true}
+              dir={dir}
             />
 
             {isTooShort && <Alert severity={"info"}>
@@ -66,7 +86,7 @@ const Create = () => {
             </Alert>}
           </Grid>
 
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={5} md={2}>
             <FormControl fullWidth={true}>
               <InputLabel id={"mode-label"}>Mode</InputLabel>
               <Select
@@ -82,30 +102,38 @@ const Create = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={7} md={2}>
+            <FormControl fullWidth={true}>
+              <InputLabel id={"language-label"}>Language</InputLabel>
+              <Select
+                label={"Language"}
+                labelId={"language-label"}
+                value={alphabet}
+                onChange={(event) => setAlphabet(event.target.value)}
+              >
+                <MenuItem value={"auto"}>Auto: {autoAlphabet.name}</MenuItem>
+                {alphabets.map(({alphabet, name}) => <MenuItem key={name} value={alphabet}>{name}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={5} md={3}>
             <TextField
               value={author}
               onChange={(event) => setAuthor(event.target.value)}
               label={"Author"}
               fullWidth={true}
+              dir={dir}
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={7} md={5}>
             <TextField
               value={origin}
               onChange={(event) => setOrigin(event.target.value)}
               label={"Origin"}
               fullWidth={true}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TextField
-              value={alphabet}
-              onChange={(event) => setAlphabet(event.target.value)}
-              label={"Alphabet"}
-              fullWidth={true}
+              dir={dir}
             />
           </Grid>
 
