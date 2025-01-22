@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useKeysDown } from "./puzzle-util";
-import { englishAlphabet } from "../constants";
+import { Language } from "../Language";
 
 const key =
   (keysDown: Set<string>) =>
@@ -17,11 +17,18 @@ type LockState = "active" | "keyspressed" | "released";
 
 const ANIMATION_DURATION = 1500;
 
-// TODO: localize the lock
-const PuzzleLock = ({ unlock }: { unlock: () => void }) => {
+interface PuzzleLockProps {
+  language: Language;
+  unlock: () => void;
+}
+
+const PuzzleLock = ({ language, unlock }: PuzzleLockProps) => {
+  const key1 = language.layout[1][3];
+  const key2 = language.layout[1][6];
+
   const [lockState, setLockState] = useState<LockState>("active");
-  const keysDown = useKeysDown(englishAlphabet, (newKeys) => {
-    if (newKeys.has("f") && newKeys.has("j") && lockState === "active") {
+  const keysDown = useKeysDown(language, (newKeys) => {
+    if (newKeys.has(key1) && newKeys.has(key2) && lockState === "active") {
       setLockState("keyspressed");
     } else if (newKeys.size === 0 && lockState === "keyspressed") {
       setLockState("released");
@@ -31,8 +38,8 @@ const PuzzleLock = ({ unlock }: { unlock: () => void }) => {
   const Key = key(keysDown);
   console.log(keysDown);
 
-  const firstKey = lockState === "released" ? "j" : "f";
-  const secondKey = lockState === "released" ? "f" : "j";
+  const firstKey = lockState === "released" ? key2 : key1;
+  const secondKey = lockState === "released" ? key1 : key2;
   return (
     <div className={"puzzle-overlay puzzle-lock " + lockState}>
       <p>To begin, simultaneously press and release the following keys:</p>

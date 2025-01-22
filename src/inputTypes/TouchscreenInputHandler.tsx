@@ -3,12 +3,8 @@ import { Portal } from "@mui/material";
 import useEventListener from "@use-it/event-listener";
 import { ReactNode, useState } from "react";
 import { UserInputHandlerProps } from "./sharedTypes";
-
-const keyboardLayout = [
-  "qwertyuiop".split(""),
-  "asdfghjkl".split(""),
-  "zxcvbnm".split(""),
-];
+import { english } from "../constants";
+import { finalToRegular } from "../puzzle/mapping";
 
 type SwapState = {
   a: string;
@@ -19,6 +15,7 @@ const TouchscreenInputHandler = ({
   swap = () => {},
   setLock = () => {},
   lockedLetters = new Set(),
+  language = english,
 }: UserInputHandlerProps) => {
   const maybeGetData = (event: any) => {
     const { clientX, clientY } = event.touches[0];
@@ -96,6 +93,8 @@ const TouchscreenInputHandler = ({
     }
   }
 
+  const maxRowLength = Math.max(...language.layout.map(line => line.length));
+
   return (
     <Portal container={document.body}>
       <div className="touchscreen-input-handler-wrapper">
@@ -106,12 +105,14 @@ const TouchscreenInputHandler = ({
             </div>
           )}
           <div className="faux-keyboard">
-            {keyboardLayout.map((row) => (
+            {language.layout.map((row) => (
               <div className="row">
-                {row.map((key) => (
+                {row.split("").map((key, index) => (
                   <span
+                    key={index}
                     className={"key " + (pressed.has(key) && "pressed")}
-                    data-faux-keyboard-key={key}
+                    data-faux-keyboard-key={finalToRegular(key)}
+                    style={{minWidth: `${Math.floor(100 / maxRowLength)}%`}}
                   >
                     {key}
                   </span>

@@ -1,20 +1,21 @@
 import { Card } from "@mui/material";
 import { useKeysDown } from "./puzzle-util";
-import { englishAlphabet, hebrewAlphabet } from "../constants";
+import { english } from "../constants";
 import { finalToRegular } from "./mapping";
+import { Language } from "../Language";
 
 interface CipherTextDisplayProps {
   text: string;
   lockedLetters?: Set<string>;
-  alphabet?: string;
+  language?: Language;
 }
 
 const CipherTextDisplay = ({
   text,
   lockedLetters = new Set(),
-  alphabet = englishAlphabet,
+  language = english,
 }: CipherTextDisplayProps) => {
-  const keysDown = useKeysDown(alphabet);
+  const keysDown = useKeysDown(language);
 
   const children = text.split("").map((letter, index) => {
     const normalized = finalToRegular(letter.toLowerCase());
@@ -33,7 +34,7 @@ const CipherTextDisplay = ({
   });
 
   return <Card>
-    <div className="cipher-text-display" dir={alphabet === hebrewAlphabet ? "rtl" : "ltr"}>{children}</div>
+    <div className="cipher-text-display" dir={language.rtl ? "rtl" : "ltr"}>{children}</div>
   </Card>;
 };
 

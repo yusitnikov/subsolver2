@@ -6,7 +6,8 @@ import { generatePath } from "react-router-dom";
 import { Plaintext } from "../plaintexts";
 import { encodeBase64 } from "../util";
 import { CopyTextButton } from "../CopyTextButton";
-import { alphabets, hebrewAlphabet } from "../constants";
+import { languages } from "../constants";
+import { Language } from "../Language";
 
 const minLength = 20;
 
@@ -15,15 +16,15 @@ const Create = () => {
   const [author, setAuthor] = useState("");
   const [origin, setOrigin] = useState("");
   const [mode, setMode] = useState("casual");
-  const [alphabet, setAlphabet] = useState("auto");
+  const [language, setLanguage] = useState<Language>();
 
-  const autoAlphabet = useMemo(() => {
+  const autoLanguage = useMemo(() => {
     const textLetters = text.toLowerCase().split("");
 
-    let bestMatch = alphabets[0];
+    let bestMatch = languages[0];
     let bestScore = 0;
 
-    for (const item of alphabets) {
+    for (const item of languages) {
       const score = textLetters.filter(letter => item.alphabet.includes(letter)).length;
       if (score > bestScore) {
         bestMatch = item;
@@ -33,8 +34,8 @@ const Create = () => {
 
     return bestMatch;
   }, [text]);
-  const finalAlphabet = alphabet === "auto" ? autoAlphabet.alphabet : alphabet;
-  const dir = finalAlphabet === hebrewAlphabet ? "rtl" : "ltr";
+  const finalLanguage = language ?? autoLanguage;
+  const dir = finalLanguage.rtl ? "rtl" : "ltr";
 
   const isTooShort = text.trim().length < minLength;
 
@@ -44,7 +45,7 @@ const Create = () => {
       text,
       author,
       origin,
-      alphabet: finalAlphabet,
+      language: finalLanguage.code,
     };
     const encodedPlaintext = encodeBase64(JSON.stringify(plaintext));
     const link = window.location.origin + process.env.PUBLIC_URL + generatePath("/#/:mode/custom/:data", {mode, data: encodedPlaintext});
@@ -108,11 +109,13 @@ const Create = () => {
               <Select
                 label={"Language"}
                 labelId={"language-label"}
-                value={alphabet}
-                onChange={(event) => setAlphabet(event.target.value)}
+                value={language?.code ?? "auto"}
+                onChange={(event) => setLanguage(
+                  languages.find(({code}) => code === event.target.value)
+                )}
               >
-                <MenuItem value={"auto"}>Auto: {autoAlphabet.name}</MenuItem>
-                {alphabets.map(({alphabet, name}) => <MenuItem key={name} value={alphabet}>{name}</MenuItem>)}
+                <MenuItem value={"auto"}>Auto: {autoLanguage.name}</MenuItem>
+                {languages.map(({code, name}) => <MenuItem key={code} value={code}>{name}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>

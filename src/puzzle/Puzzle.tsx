@@ -2,7 +2,6 @@ import "./Puzzle.css";
 import CipherTextDisplay from "./CipherTextDisplay";
 import { ReactElement, useMemo, useState } from "react";
 import { swapLetters } from "./mapping";
-import { englishAlphabet } from "../constants";
 import { hrTime, shuffleArray } from "../util";
 import { Plaintext } from "../plaintexts";
 import { applyMapping } from "./mapping";
@@ -10,12 +9,12 @@ import KeyboardPuzzleLock from "./KeyboardPuzzleLock";
 import { getAllSolved } from "../solvedStore";
 import { recordEvent } from "../tracking";
 import getInputSchema from "../inputTypes";
+import { Language } from "../Language";
 
 export interface GameModifiers {
   hideSpaces?: boolean;
   showPunctuation?: boolean;
   keepCapitals?: boolean;
-  alphabet?: string;
 }
 
 type PuzzleState = "locked" | "active" | "complete";
@@ -27,6 +26,7 @@ const startLocked = () => {
 
 interface PuzzleProps extends GameModifiers {
   plaintext: Plaintext;
+  language: Language;
   onComplete: () => void;
   solvedOverlay: (solvedTime: string) => ReactElement;
   pushEvent: (evtStr: string) => unknown;
@@ -40,12 +40,12 @@ function Puzzle({
   hideSpaces,
   showPunctuation,
   keepCapitals,
-  alphabet = englishAlphabet,
+  language,
 }: PuzzleProps) {
   const { inputHandler: InputHandler } = getInputSchema();
 
   const shouldStartLocked = startLocked();
-  const initialMapping = useMemo(() => shuffleArray(alphabet.split("")).join(""), [alphabet]);
+  const initialMapping = useMemo(() => shuffleArray(language.alphabet.split("")).join(""), [language]);
   const [mapping, setMapping] = useState<string>(initialMapping);
   const [lockedLetters, setLockedLetters] = useState<Set<string>>(new Set());
   const [puzzleState, setPuzzleState] = useState<PuzzleState>(
@@ -70,7 +70,7 @@ function Puzzle({
       const newMapping = swapLetters(mapping, a, b);
       setMapping(newMapping);
       pushEvent(`"${a.toUpperCase()}" and "${b.toUpperCase()}" swapped.`);
-      if (applyMapping(text, newMapping, {alphabet}) === applyMapping(text, alphabet, {alphabet})) {
+      if (applyMapping(text, newMapping, {language}) === applyMapping(text, language.alphabet, {language})) {
         pushEvent(id ? `Puzzle #${id} solved` : "Custom puzzle solved");
         const allSolved = getAllSolved();
         const puzzleEndTime = new Date();
@@ -129,7 +129,7 @@ function Puzzle({
     const holedMapping = mapping
       .split("")
       .map((letter) => (lockedLetters.has(letter) ? letter : undefined));
-    const unlockedLetters = alphabet
+    const unlockedLetters = language.alphabet
       .split("")
       .filter((letter) => !lockedLetters.has(letter));
     const shuffledLocked = shuffleArray(unlockedLetters);
@@ -149,10 +149,10 @@ function Puzzle({
               hideSpaces,
               showPunctuation,
               keepCapitals,
-              alphabet,
+              language,
             })}
             lockedLetters={lockedLetters}
-            alphabet={alphabet}
+            language={language}
           />
         </div>
         <div className="puzzle-buttons-wrapper">
@@ -173,6 +173,7 @@ function Puzzle({
         )}
         {puzzleState === "locked" && (
           <KeyboardPuzzleLock
+            language={language}
             unlock={() => {
               setPuzzleState("active");
               setPuzzleStartTime(new Date());
@@ -184,7 +185,7 @@ function Puzzle({
         swap={suppressIfInactive(handleSwap)}
         setLock={suppressIfInactive(handleLocked)}
         lockedLetters={lockedLetters}
-        alphabet={alphabet}
+        language={language}
       />
     </div>
   );

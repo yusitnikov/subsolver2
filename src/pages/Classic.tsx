@@ -21,6 +21,8 @@ import getInputSchema from "../inputTypes";
 import { cameFromFacebook, shareTime } from "../fb";
 import PageHeader from "../layout/PageHeader";
 import { CopyTextButton } from "../CopyTextButton";
+import { english, languages } from "../constants";
+import { Language } from "../Language";
 
 interface ClassicProps {
   headerText: string;
@@ -49,12 +51,14 @@ const chooseNextPlaintext = () => {
 interface ClassicPuzzleProps {
   gameModifiers?: GameModifiers;
   plainText: Plaintext;
+  language: Language;
   pushEvent: (k: string) => unknown;
   startNewPuzzle: () => void;
 }
 
 const ClassicPuzzle = ({
   gameModifiers,
+  language,
   plainText,
   pushEvent,
   startNewPuzzle,
@@ -72,6 +76,7 @@ const ClassicPuzzle = ({
   return (
     <Puzzle
       plaintext={plainText}
+      language={language}
       key={plainText.text}
       onComplete={() => {
         if (plainText.id) {
@@ -161,6 +166,7 @@ const ClassicPageContents = ({
   if (!plainText) {
     return <Redirect to={basePath} />;
   }
+  const language = languages.find(({code, alphabet}) => code === plainText.language || alphabet === plainText.alphabet) ?? english;
   return (
     <article className="main-content">
       <header className="puzzle-header">
@@ -170,9 +176,10 @@ const ClassicPageContents = ({
         </span>
       </header>
       <ClassicPuzzle
-        gameModifiers={{...gameModifiers, alphabet: plainText.alphabet}}
+        gameModifiers={gameModifiers}
         startNewPuzzle={startNewPuzzle}
         plainText={plainText}
+        language={language}
         pushEvent={pushEvent}
         key={puzzleId}
       />

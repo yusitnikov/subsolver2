@@ -1,10 +1,11 @@
-import { englishAlphabet, finalLettersMap, finalLettersReverseMap } from "../constants";
+import { english, finalLettersMap, finalLettersReverseMap } from "../constants";
+import { Language } from "../Language";
 
 interface MappingOptions {
   hideSpaces?: boolean;
   showPunctuation?: boolean;
   keepCapitals?: boolean;
-  alphabet?: string;
+  language?: Language;
 }
 
 export const regularToFinal = (letter: string) => finalLettersMap[letter] ?? letter;
@@ -16,7 +17,7 @@ const _normalizeText = (
     hideSpaces = false,
     showPunctuation = false,
     keepCapitals = false,
-    alphabet = englishAlphabet,
+    language = english,
   }: MappingOptions
 ) => {
   let text = inText;
@@ -28,7 +29,7 @@ const _normalizeText = (
     text = text.replace(/[-…—]/g, " ");
   }
   if (!showPunctuation) {
-    const rejectionRegex = new RegExp(`[^${alphabet}${hideSpaces ? "" : " "}]`, "ig");
+    const rejectionRegex = new RegExp(`[^${language.alphabet}${hideSpaces ? "" : " "}]`, "ig");
     text = text.replace(rejectionRegex, "");
   }
   return text;
@@ -39,7 +40,8 @@ export const applyMapping = (
   mapping: string,
   mappingOptions: MappingOptions = {}
 ) => {
-  const {alphabet = englishAlphabet} = mappingOptions;
+  const {language = english} = mappingOptions;
+  const {alphabet} = language;
 
   return _normalizeText(text, mappingOptions)
     .split("")

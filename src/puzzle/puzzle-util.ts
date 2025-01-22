@@ -2,8 +2,9 @@ import { useState } from "react";
 import keysPressed from "../keyspressed";
 import useEventListener from "@use-it/event-listener";
 import { finalToRegular } from "./mapping";
+import {Language} from "../Language";
 
-const getLettersPressed = (alphabet: string) =>
+const getLettersPressed = ({alphabet}: Language) =>
   new Set(
     Array.from(keysPressed.getKeysPressed())
       .map((key) => key === " " ? "space" : key.toLowerCase())
@@ -12,19 +13,19 @@ const getLettersPressed = (alphabet: string) =>
   );
 
 export const useKeysDown = (
-  alphabet: string,
+  language: Language,
   handleKeysChange: (keys: Set<string>) => unknown = () => {}
 ) => {
   const [keysDown, setKeysDown] = useState<Set<string>>(new Set());
 
   const keyDownHandler = () => {
-    const next = getLettersPressed(alphabet);
+    const next = getLettersPressed(language);
     setKeysDown(next);
     handleKeysChange(next);
   };
 
   const keyUpHandler = () => {
-    const next = getLettersPressed(alphabet);
+    const next = getLettersPressed(language);
     setKeysDown(next);
     handleKeysChange(next);
   };

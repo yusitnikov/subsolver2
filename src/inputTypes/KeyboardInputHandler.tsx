@@ -1,7 +1,7 @@
 import { ReactElement, useState } from "react";
 import { useKeysDown } from "../puzzle/puzzle-util";
 import { UserInputHandlerProps } from "./sharedTypes";
-import { englishAlphabet } from "../constants";
+import { english } from "../constants";
 
 const defaultSwap: UserInputHandlerProps["swap"] = (a, b) =>
   console.log(`Swapped ${a} and ${b}!`);
@@ -24,7 +24,7 @@ const UserInputHandler = (props: UserInputHandlerProps) => {
     swap = defaultSwap,
     setLock = defaultSetLock,
     lockedLetters = new Set(),
-    alphabet = englishAlphabet,
+    language = english,
   } = props;
   const [swapState, setSwapState] = useState<SwapState>({
     type: "none",
@@ -59,7 +59,7 @@ const UserInputHandler = (props: UserInputHandlerProps) => {
     }
   };
 
-  const keysDown = useKeysDown(alphabet, handleSwapState);
+  const keysDown = useKeysDown(language, handleSwapState);
 
   let swapStateRep: ReactElement | null = null;
   if (swapState.type === "swap") {

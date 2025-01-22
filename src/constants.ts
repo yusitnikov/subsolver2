@@ -1,12 +1,25 @@
-export const englishAlphabet = "abcdefghijklmnopqrstuvwxyz";
-export const russianAlphabet = "йцукенгшщзхъфывапролджэячсмитьбю";
-export const hebrewAlphabet = "קראטופשדגכעיחלזסבהנמצת";
+import { Language } from "./Language";
 
-export const alphabets = [
-  {alphabet: englishAlphabet, name: "English"},
-  {alphabet: russianAlphabet, name: "Русский"},
-  {alphabet: hebrewAlphabet, name: "עברית"},
-];
+export const english: Language = {
+  code: "en",
+  name: "English",
+  alphabet: "abcdefghijklmnopqrstuvwxyz",
+  layout: ["qwertyuiop", "asdfghjkl", "zxcvbnm"],
+};
+export const russian: Language = {
+  code: "ru",
+  name: "Русский",
+  alphabet: "йцукенгшщзхъфывапролджэячсмитьбю",
+  layout: ["йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю"],
+};
+export const hebrew: Language = {
+  code: "he",
+  name: "עברית",
+  alphabet: "קראטופשדגכעיחלזסבהנמצת",
+  layout: ["קראטוןםפ", "שדגכעיחלךף", "זסבהנמצתץ"],
+  rtl: true,
+};
+export const languages = [english, russian, hebrew];
 
 export const finalLettersMap: Record<string, string> = {
   "נ": "ן",
